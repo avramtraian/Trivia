@@ -3,24 +3,27 @@ using UnityEngine.UI;
 
 public class QuestionManager : MonoBehaviour
 {
+    public Player m_Player;
+
     public QuestionSet Questions;
 
-    private Question CurrentQuestion;
+    private Question m_CurrentQuestion;
     private bool m_HasAnswered = false;
     private int m_Answer;
     private int m_AnsweredButtonIndex;
 
     public QuestionText m_QuestionText;
     public AnswerButton[] m_AnswerButtons = new AnswerButton[5];
+    public GameObject m_QuestionsUI;
 
     public void RandomizeQuestion()
     {
-        CurrentQuestion = Questions.GetRandomQuestion().GetComponent<Question>();
+        m_CurrentQuestion = Questions.GetRandomQuestion().GetComponent<Question>();
         for (int i = 0; i < m_AnswerButtons.Length; i++)
-            m_AnswerButtons[i].SetQuestion(CurrentQuestion, i);
-        m_QuestionText.SetText(CurrentQuestion.GetQuestionText());
+            m_AnswerButtons[i].SetQuestion(m_CurrentQuestion, i);
+        m_QuestionText.SetText(m_CurrentQuestion.GetQuestionText());
 
-        Debug.Log(CurrentQuestion.GetQuestionText());
+        Debug.Log(m_CurrentQuestion.GetQuestionText());
     }
 
     public void OnAnswer(int buttonIndex)
@@ -30,24 +33,26 @@ public class QuestionManager : MonoBehaviour
             m_HasAnswered = true;
             m_Answer = buttonIndex;
             m_AnsweredButtonIndex = buttonIndex;
-            m_AnswerButtons[buttonIndex].SetSelectedSprite();
+            for (int i = 0; i < m_AnswerButtons.Length; i++)
+                m_AnswerButtons[i].Disable();
             Debug.Log("Response: " + m_Answer);
         }
     }
 
     public void ValidateAnswer()
     {
-        if(CurrentQuestion.GetCorrectAnswerIndex() == m_Answer)
+        if(m_CurrentQuestion.GetCorrectAnswerIndex() == m_Answer)
         {
             Debug.Log("Answer correct!");
-            if (m_AnsweredButtonIndex != -1)
-                m_AnswerButtons[m_AnsweredButtonIndex].SetAsCorrectAnswer();
+            m_AnswerButtons[m_AnsweredButtonIndex].SetCorrect();
+            m_Player.AddScore(5);
         }
         else
         {
-            m_AnswerButtons[m_AnsweredButtonIndex].SetAsWrongAnswer();
-            m_AnswerButtons[CurrentQuestion.GetCorrectAnswerIndex()].SetCorrectAnswer();
             Debug.Log("Answer incorrect!");
+            m_AnswerButtons[m_AnsweredButtonIndex].SetWrong();
+            m_AnswerButtons[m_CurrentQuestion.GetCorrectAnswerIndex()].SetCorrect();
+            m_Player.AddScore(-5);
         }
     }
 
@@ -56,7 +61,12 @@ public class QuestionManager : MonoBehaviour
         m_HasAnswered = false;
         m_AnsweredButtonIndex = -1;
         for (int i = 0; i < m_AnswerButtons.Length; i++)
-            m_AnswerButtons[i].ResetSprite();
+            m_AnswerButtons[i].Reset();
+    }
+
+    public void OnOver()
+    {
+        m_QuestionsUI.SetActive(false);
     }
 
     public bool HasAnswered()

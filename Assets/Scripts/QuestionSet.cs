@@ -1,10 +1,10 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 public class QuestionSet : MonoBehaviour
 {
-    public GameObject[] Questions = new GameObject[4];
-
-    private int m_GeneratedTimes = 0;
+    public List<GameObject> Questions = new List<GameObject>();  
 
     public GameObject GetQuestion(int index)
     {
@@ -13,8 +13,10 @@ public class QuestionSet : MonoBehaviour
 
     public GameObject GetRandomQuestion()
     {
-        int randomIndex = Random.Range(0, Questions.Length);
+        int randomIndex = Random.Range(0, Questions.Count);
+        Debug.Log(Questions.Count);
         GameObject question = Questions[randomIndex];
+        Questions.RemoveAt(randomIndex);
         
         return question;
     }

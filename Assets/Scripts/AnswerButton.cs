@@ -4,12 +4,13 @@ using UnityEngine.UI;
 
 public class AnswerButton : MonoBehaviour
 {
+    public Button m_Button;
     public TextMeshProUGUI m_Text;
-    public Sprite m_UnselectedSprite;
-    public Sprite m_SelectedSprite;
-    public Sprite m_CorrectSelectedSprite;
-    public Sprite m_WrongSelectedSprite;
+    public Image m_Image;
+    public RectTransform m_ImageTransform;
+
     public Sprite m_CorrectSprite;
+    public Sprite m_WrongSprite;
 
     public GameManager m_GameManager;
     private Question m_Question;
@@ -27,28 +28,41 @@ public class AnswerButton : MonoBehaviour
         m_Text.text = m_Question.GetAnswerText(m_AnswerIndex);
     }
 
-    public void SetSelectedSprite()
+    public void SetChecked()
     {
-        this.GetComponent<Image>().sprite = m_SelectedSprite;
+            ColorBlock newColors = m_Button.colors;
+            newColors.disabledColor = new Color(255, 255, 255, 160);
+            m_Button.colors = newColors;
+            m_Button.interactable = false;
     }
 
-    public void SetAsCorrectAnswer()
+    public void Reset()
     {
-        this.GetComponent<Image>().sprite = m_CorrectSelectedSprite;
+        ColorBlock newColors = m_Button.colors;
+        newColors.disabledColor = new Color(255, 255, 255, 0);
+        m_Button.colors = newColors;
+        m_Button.interactable = true;
+
+        m_ImageTransform.Rotate(new Vector3(0.0f, 0.0f, -m_ImageTransform.eulerAngles.z));
+        m_Image.enabled = false;
     }
 
-    public void SetAsWrongAnswer()
+    public void SetCorrect()
     {
-        this.GetComponent<Image>().sprite = m_WrongSelectedSprite;
+        m_Image.sprite = m_CorrectSprite;
+        m_Image.enabled = true;
+        m_ImageTransform.Rotate(new Vector3(0.0f, 0.0f, -m_ImageTransform.eulerAngles.z));
     }
 
-    public void SetCorrectAnswer()
+    public void SetWrong()
     {
-        this.GetComponent<Image>().sprite = m_CorrectSprite;
+        m_Image.sprite = m_WrongSprite;
+        m_Image.enabled = true;
+        m_ImageTransform.Rotate(new Vector3(0.0f, 0.0f, -m_ImageTransform.eulerAngles.z + 45.0f));
     }
 
-    public void ResetSprite()
+    public void Disable()
     {
-        this.GetComponent<Image>().sprite = m_UnselectedSprite;
+        m_Button.interactable = false;
     }
 }
